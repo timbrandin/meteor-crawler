@@ -3,7 +3,7 @@
   "description": "A simple web-crawler.",
   "homepage": "https://github.com/timbrandin/meteor-crawler",
   "author": "Tim Brandin <tim.brandin@gmail.com> (http://timbrandin.com)",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "git": "https://github.com/timbrandin/meteor-crawler.git",
   "packages": {}
 }
