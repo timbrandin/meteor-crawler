@@ -6,7 +6,8 @@ A simple web-crawler built in Meteor.
 
 Create an instance
 
+    // The crawler does always need a collection.
     var crawler = new Crawler('example_com');
 
-    // The crawler does always need a collection.
+    // Consume some website.
     crawler.consume('http://example.com');
