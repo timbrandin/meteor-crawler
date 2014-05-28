@@ -1,11 +1,9 @@
 {
   "name": "crawler",
   "description": "A simple web-crawler.",
-  "homepage": "",
+  "homepage": "https://github.com/timbrandin/meteor-crawler",
   "author": "Tim Brandin <tim.brandin@gmail.com> (http://timbrandin.com)",
   "version": "0.0.1",
-  "git": "",
-  "packages": {
-    "cheerio": "0.3.2"
-  }
+  "git": "https://github.com/timbrandin/meteor-crawler.git",
+  "packages": {}
 }
