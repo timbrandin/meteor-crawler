@@ -1,0 +1,11 @@
+{
+  "name": "crawler",
+  "description": "A simple web-crawler.",
+  "homepage": "",
+  "author": "Tim Brandin <tim.brandin@gmail.com> (http://timbrandin.com)",
+  "version": "0.0.1",
+  "git": "",
+  "packages": {
+    "cheerio": "0.3.2"
+  }
+}
