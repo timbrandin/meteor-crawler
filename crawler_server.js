@@ -40,6 +40,7 @@ Meteor.publish('pagequeue', function(collection) {
 
 Crawler = function(options) {
   _.extend(this, _defaults(), options || {});
+  Crawlers.upsert({_id: this._id}, {$set: this});
   return this;
 };
 
@@ -47,6 +48,7 @@ _.extend(Crawler.prototype, {
   get: function(id) {
     return crawlers[id];
   },
+
   consume: function(url) {
     if (!url) {
       throw new Error('Missing url to consume');
