@@ -1,111 +1,16 @@
 var cheerio = Npm.require('cheerio');
 var URL = Npm.require('url');
 
-Meteor.startup(function() {
-  PageQueue._ensureIndex('url', {
-    index: true,
-    unique: true,
-    dropDups: true
-  });
-
-  // Create a crawler if it doesn't exist.
-  if (Crawlers.find().count() == 0) {
-    var initalCrawler = new Crawler();
-  }
-
-  Crawlers.find().observe({
-    changed: function(doc) {
-      // console.log(doc, 'hej');
-      var crawler = new Crawler(doc);
-      // if (crawler.running) {
-      //   crawler.start();
-      // }
-      // else {
-      //   crawler.stop();
-      // }
-    }
-  })
-});
-
-Meteor.methods({
-  'hej': function(doc) {
-    return new Crawler(doc);
-  }
-})
-
-Meteor.publish('crawlers', function() {
-  return Crawlers.find();
-});
-
-Meteor.publish('pagequeue', function(collection) {
-  PageQueue.find({collection: collection}, {
-    fields: {
-      url: true,
-      done: true,
-      timestamp: true
-    }
-  });
-});
-
-Crawler = function(options) {
-  // Some kind of singelton pattern going on.
-  Crawler.crawlers = Crawler.crawlers || [];
-  var self = this;
-
-  var instance;
-
-  // When passing no _id, one will always get a new Crawler.
-  if (options && options._id) {
-    // console.log(options._id);
-    instance = _.findWhere(Crawler.crawlers, {_id: options._id});
-    console.log('found', instance);
-  }
-
-  // Add the instance of the Crawler to the list of crawlers.
-  if (!instance) {
-    instance = self;
-    // _.extend(instance, _defaults(), options || {});
-    Crawler.crawlers.push(instance);
-
-    console.log('added self', instance);
-    console.log(Crawler.crawlers);
-  }
-
-
-  _.extend(instance, _defaults(), options || {});
-
-  console.log(instance);
-
-  var fields = self;
-
-  // Find the keys for all functions in this.
-  var functions = _.reject(_.map(fields, function(value, key) {
-    return _.isFunction(value) ? key : null;
-  }), _.isNull);
-
-  // Omit all functions of this object.
-  fields = _.omit(fields, functions);
-
-  // Update database with the new options or defaults.
-  Crawlers.upsert({_id: instance._id}, fields);
-
-  return instance;
-};
-
-// XXX Remove when done testing.
-Meteor.methods({
-  'createCrawler': function(options) {
-    return new Crawler(options);
-  }
-});
-
-// Public static - expose the collections.
-Crawler.queue = PageQueue;
-Crawler.instances = Crawlers;
-
-_.extend(Crawler.prototype, {
+// Crawler.Collection = function(collection) {
+//   return this;
+// };
+//
+// Crawler.Collection.prototype = new Meteor.Collection();
+// Crawler.Collection.constructor = Crawler.Collection;
+var v = {};
+_.extend(v, {
   consume: function(url) {
-    var next = this.next();
+    var next = _next();
     if (!next) {
       this.stop();
     }
@@ -147,12 +52,12 @@ _.extend(Crawler.prototype, {
         self.consume();
       }
     }, this.timeout);
-  },
-
-  next: function() {//done: false,
-    PageQueue.findOne({claim: {$exists: false}}, {sort: {timestamp: -1}});
   }
 });
+
+var _next = function() {//done: false,
+  PageQueue.findOne({claim: {$exists: false}}, {sort: {timestamp: -1}});
+};
 
 var _consume = function(url) {
   if (!url) {

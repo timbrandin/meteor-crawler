@@ -1,18 +1,14 @@
-Crawlers = new Meteor.Collection('crawlers', {
-  _preventAutopublish: true
-});
+Crawler = {};
+Crawler.Collection = function(collection){
+  Meteor.Collection.apply(this, arguments);
+  this.Queue = new Meteor.Collection(collection + '_queue');
+};
 
-PageQueue = new Meteor.Collection('pagequeue', {
-  _preventAutopublish: true
-});
+Crawler.Collection.prototype = Object.create(Meteor.Collection.prototype);
+Crawler.Collection.prototype.constructor = Crawler.Collection;
 
-Meteor.startup(function() {
-  Crawlers.find().observe({
-    added: function(doc) {
-      new Crawler(doc);
-    },
-    removed: function(doc) {
-      // console.log(crawlers);
-    }
-  });
+_.extend(Crawler.Collection.prototype, {
+  consume: function(url) {
+    console.log('hej');
+  }
 });
