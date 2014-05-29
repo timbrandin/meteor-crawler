@@ -1,3 +1,7 @@
+_.extend(Crawler.Collection.prototype, {
+
+});
+
 // Crawler = function(options) {
 //   // Some kind of singelton pattern going on.
 //   Crawler.crawlers = Crawler.crawlers || [];

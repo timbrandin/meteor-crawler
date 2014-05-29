@@ -42,6 +42,25 @@ testAsyncMulti('Crawler - One can consume a page.', [function(test, expect) {
   Crawlers.consume('http://example.com', expect(function(err, res) {
     test.isTrue(res, 'Result is empty.');
     test.equal(typeof res, 'object', 'Result is not a Object');
-    test.equal(typeof res.content, 'string', 'Content is not a string');
+    test.equal(typeof res.content, 'string', 'Content is not a String');
   }));
 }]);
+
+if (Meteor.isServer) {
+  testAsyncMulti('Crawler - Crawler can parse links from a page.', [function(test, expect) {
+    test.equal(typeof Crawlers._parse, 'function', 'Missing function _parse on collection.');
+    var responseContent;
+    Crawlers.consume('http://example.com', expect(function(err, res) {
+      responseContent = res.content;
+    }));
+
+    Crawlers._parse(responseContent, expect(function(err, res) {
+      test.isTrue(res, 'Result is empty.');
+      test.equal(typeof res, 'object', 'Result is not a Object');
+      var a = _.first(res);
+      test.equal(typeof a, 'object', 'No link found on http://example.com.');
+      test.equal(typeof a.name, 'string', 'No link found on http://example.com.');
+      test.equal(a.name, 'a', 'Parse returned something else than a link found on http://example.com.');
+    }));
+  }]);
+}

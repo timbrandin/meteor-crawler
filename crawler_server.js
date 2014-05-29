@@ -3,21 +3,20 @@ var URL = Npm.require("url");
 var Future = Npm.require("fibers/future");
 
 _.extend(Crawler.Collection.prototype, {
-
+  _parse: function(content, callback) {
+    Meteor.call('crawler/parse', content, callback);
+  }
 });
 
 Meteor.methods({
   'crawler/consume': function(url, collection) {
     return _consume.call(this, url, collection);
+  },
+  'crawler/parse': function(content) {
+    return _parse.call(this, content);
   }
 });
 
-// Crawler.Collection = function(collection) {
-//   return this;
-// };
-//
-// Crawler.Collection.prototype = new Meteor.Collection();
-// Crawler.Collection.constructor = Crawler.Collection;
 var v = {};
 _.extend(v, {
   consume: function(url) {
@@ -94,31 +93,40 @@ var _consume = function(url, collection) {
 }
 
 var _parse = function(responseContent) {
-  if (responseContent) {
-    PageQueue.upsert({url: url}, {$set: {
-      content: responseContent,
-      done: true
-    }, $unset: {
-      claim: true
-    }});
-  } else {
-    throw new Error(url + ' returned ' + responseContent);
-  }
+  var fut = new Future();
+  var self = this;
+  (function() {
 
-  $ = cheerio.load(responseContent);
-  var links = $('a');
-  _.each(links, function(link) {
-    var $link = $(link);
-    var href = $link.attr('href');
-    if (href) {
-      if (!/http[s]?:\/\//i.test(href)) {
-        href = Meteor.absoluteUrl(href.replace(/^\//, ''), {
-          rootUrl: url
-        });
+    // if (responseContent) {
+    //   PageQueue.upsert({url: url}, {$set: {
+    //     content: responseContent,
+    //     done: true
+    //   }, $unset: {
+    //     claim: true
+    //   }});
+    // } else {
+    //   throw new Error(url + ' returned ' + responseContent);
+    // }
+
+    $ = cheerio.load(responseContent);
+    var links = $('a');
+    _.each(links, function(link, i) {
+      var $link = $(link);
+      var href = $link.attr('href');
+      if (href) {
+        if (!/http[s]?:\/\//i.test(href)) {
+          href = Meteor.absoluteUrl(href.replace(/^\//, ''), {
+            rootUrl: url
+          });
+        }
+        console.log(href);
       }
-      console.log(href);
-    }
-  });
+    });
+
+    fut.return(links);
+  })();
+
+  return fut.wait();
 }
 
 var _defaults = function() {
