@@ -13,6 +13,9 @@ A simple web-crawler built in Meteor.
     // Consume just one page (good for testing).
     Crawlers.consume('http://example.com');
 
+    // One can also pass an optional asynchronous callback.
+    Crawlers.consume('http://example.com' [, function(err, res) {}]);
+
     // Start Crawling a website.
     Crawlers.start('http://example.com');
 

@@ -39,8 +39,9 @@ Tinytest.add('Crawler - One can create new crawlers in a collection.', function(
 
 testAsyncMulti('Crawler - One can consume a page.', [function(test, expect) {
   test.equal(typeof Crawlers.consume, 'function', 'Missing function consume on collection.');
-  test.instanceOf(Crawlers.Queue, Meteor.Collection, 'Crawlers.Queue is not of instance as expected.');
-  Crawlers.insert({});
-  Crawlers.consume('http://example.com');
-
+  Crawlers.consume('http://example.com', expect(function(err, res) {
+    test.isTrue(res, 'Result is empty.');
+    test.equal(typeof res, 'object', 'Result is not a Object');
+    test.equal(typeof res.content, 'string', 'Content is not a string');
+  }));
 }]);

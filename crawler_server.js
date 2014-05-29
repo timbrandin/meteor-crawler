@@ -1,5 +1,16 @@
-var cheerio = Npm.require('cheerio');
-var URL = Npm.require('url');
+var cheerio = Npm.require("cheerio");
+var URL = Npm.require("url");
+var Future = Npm.require("fibers/future");
+
+_.extend(Crawler.Collection.prototype, {
+
+});
+
+Meteor.methods({
+  'crawler/consume': function(url, collection) {
+    return _consume.call(this, url, collection);
+  }
+});
 
 // Crawler.Collection = function(collection) {
 //   return this;
@@ -59,24 +70,30 @@ var _next = function() {//done: false,
   PageQueue.findOne({claim: {$exists: false}}, {sort: {timestamp: -1}});
 };
 
-var _consume = function(url) {
+var _consume = function(url, collection) {
+  var fut = new Future();
+  this.unblock();
+
   if (!url) {
     throw new Error('Missing url to consume');
   }
 
-  if (!this.collection) {
-    throw new Error('Missing collection on Crawler');
-  }
-
-  var responseContent;
-  try {
-    responseContent = HTTP.get(url, {
+  HTTP.get(url, {
       query: '_escaped_fragment_=key=value'
-    }).content;
-  } catch (err) {
-    console.log(err);
-  }
+    }, function(err, res) {
+      if (err) {
+        fut.throw('Something went wrong: ' + err.message);
+      }
+      else {
+        fut.return(res);
+      }
+    }
+  );
 
+  return fut.wait();
+}
+
+var _parse = function(responseContent) {
   if (responseContent) {
     PageQueue.upsert({url: url}, {$set: {
       content: responseContent,
