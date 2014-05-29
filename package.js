@@ -15,7 +15,7 @@ Package.on_use(function (api, where) {
 });
 
 Package.on_test(function (api) {
-  api.use('crawler');
+  api.use(['tinytest', 'test-helpers', 'crawler']);
 
   api.add_files('crawler_tests.js', ['client', 'server']);
 });
